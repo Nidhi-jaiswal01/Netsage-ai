@@ -1,0 +1,31 @@
+case_id,category,check_triggered,detail
+C001,VLAN,none,No deterministic rule triggered for this case
+C002,VLAN,none,No deterministic rule triggered for this case
+C003,VLAN,missing_vlan,Referenced VLAN explicitly noted as not listed on this switch
+C004,VLAN,none,No deterministic rule triggered for this case
+C005,Gateway,interface_down,Interface or SVI is administratively down
+C006,Gateway,none,No deterministic rule triggered for this case
+C007,Gateway,duplicate_ip,IP 192.168.30.1 seen with two different MAC addresses (0011.2222.3333 and 00aa.bbcc.ddee)
+C008,Gateway,interface_down,Interface or SVI line protocol is down/down
+C009,DHCP,none,No deterministic rule triggered for this case
+C010,DHCP,none,No deterministic rule triggered for this case
+C011,DHCP,none,No deterministic rule triggered for this case
+C012,DHCP,none,No deterministic rule triggered for this case
+C013,DNS,none,No deterministic rule triggered for this case
+C014,DNS,none,No deterministic rule triggered for this case
+C015,DNS,none,No deterministic rule triggered for this case
+C016,Routing,missing_route,Expected route to destination network appears to be missing
+C017,Routing,missing_route,Expected route to destination network appears to be missing
+C018,Routing,none,No deterministic rule triggered for this case
+C019,Routing,none,No deterministic rule triggered for this case
+C020,ACL,none,No deterministic rule triggered for this case
+C021,ACL,none,No deterministic rule triggered for this case
+C022,ACL,none,No deterministic rule triggered for this case
+C023,ACL,none,No deterministic rule triggered for this case
+C024,NAT,missing_route,Expected route to destination network appears to be missing
+C025,NAT,none,No deterministic rule triggered for this case
+C026,NAT,none,No deterministic rule triggered for this case
+C027,Wireless,none,No deterministic rule triggered for this case
+C028,Wireless,none,No deterministic rule triggered for this case
+C029,Wireless,none,No deterministic rule triggered for this case
+C030,Wireless,none,No deterministic rule triggered for this case
