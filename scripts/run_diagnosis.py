@@ -63,7 +63,8 @@ def call_ai(client: Groq, system_prompt: str, user_message: str, retries: int = 
                     {"role": "user", "content": user_message},
                 ],
                 temperature=0.2,  # low temperature: we want consistent, non-creative diagnosis
-                max_tokens=600,
+                max_completion_tokens=2000,  # gpt-oss models spend tokens on internal reasoning before the final answer, so this needs headroom
+                reasoning_effort="low",  # keep reasoning brief so more budget goes to the actual JSON answer
             )
             return response.choices[0].message.content
         except Exception as e:
