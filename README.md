@@ -1,1 +1,1 @@
-"NetSage AI — troubleshooting assistant project."
+"NetSage AI - troubleshooting assistant project."
