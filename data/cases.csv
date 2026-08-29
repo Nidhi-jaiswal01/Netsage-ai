@@ -1,0 +1,77 @@
+case_id,category,symptom,topology_note,show_output,expected_fault,osi_layer,concept_tag,severity,source
+C001,VLAN,"PC on VLAN 30 cannot reach anything, including its own gateway.","PC connected to switchport Gi0/3, intended to be access VLAN 30.","show interfaces Gi0/3 switchport
+Administrative Mode: static access
+Access Mode VLAN: 1 (default)",Switchport assigned to default VLAN 1 instead of VLAN 30,Layer 2,vlan-misassignment,High,simulated
+C002,VLAN,Two PCs on the same VLAN cannot ping each other despite correct IP addresses.,"Both PCs on VLAN 20, connected via two switches with a trunk link between them.","show interfaces trunk
+Port   Mode   Encapsulation  Status    Native vlan
+Gi0/1  auto   n-802.1q      trunking  1
+Allowed VLANs: 1,10,40",VLAN 20 not included in the allowed VLAN list on the trunk,Layer 2,trunk-vlan-pruning,Medium,simulated
+C003,VLAN,New VLAN created but devices assigned to it still can't communicate; VLAN not visible on other switch.,VTP domain configured across 3 switches; new VLAN 60 added only on Switch A.,"show vlan brief (Switch B)
+VLAN 60 not listed",VLAN not propagated due to VTP mode mismatch (Switch A in transparent mode),Layer 2,vtp-propagation,Medium,simulated
+C004,VLAN,Voice VLAN phone fails to register; data still passes fine from the same port.,"Switchport Gi0/7 configured for PC + IP phone, using voice VLAN 15.","show interfaces Gi0/7 switchport
+Voice VLAN: none",Voice VLAN not configured on the switchport,Layer 2,voice-vlan-missing,Low,simulated
+C005,Gateway,"PC can ping its own IP and other PCs on the same subnet, but not the default gateway.",PC 192.168.10.5/24 gateway should be 192.168.10.1 on VLAN 10 SVI.,"show ip interface brief
+Vlan10  unassigned  YES manual  administratively down  down",VLAN 10 SVI is administratively down,Layer 3,gateway-interface-down,High,simulated
+C006,Gateway,PC cannot reach gateway even though gateway interface shows up/up.,PC configured with gateway 192.168.20.1; SVI Vlan20 is up.,"PC ipconfig
+Default Gateway: 192.168.20.254",Incorrect default gateway configured on the PC (mismatched with actual SVI IP),Layer 3,gateway-misconfig-endpoint,Medium,simulated
+C007,Gateway,Intermittent gateway reachability; ping succeeds sometimes and times out other times.,PC and gateway on VLAN 30; duplicate IP suspected.,"show ip arp
+Internet  192.168.30.1  0  0011.2222.3333  ARPA  Vlan30
+Internet  192.168.30.1  0  00aa.bbcc.ddee  ARPA  Vlan30",Duplicate IP address on the network causing ARP conflict,Layer 3,duplicate-ip-arp-conflict,High,simulated
+C008,Gateway,All PCs on a subnet lose gateway access after a switch reboot.,VLAN 40 SVI configured on a stacked switch; HSRP not in use.,"show ip interface brief
+Vlan40  192.168.40.1  YES NVRAM  down  down","SVI line protocol down, likely no active ports assigned to VLAN 40 after reboot",Layer 3,svi-down-post-reboot,Medium,simulated
+C009,DHCP,New PC gets a 169.254.x.x address instead of an IP from the DHCP server.,PC on VLAN 30; DHCP server is centralized on VLAN 10 via IP helper.,"show running-config interface Vlan30
+(no ip helper-address configured)","Missing ip helper-address on VLAN 30 SVI, so DHCP requests never reach the server",Layer 3,dhcp-relay-missing,High,simulated
+C010,DHCP,"Some PCs on a VLAN get IP addresses, others do not.",DHCP pool for VLAN 20 configured with a small address range.,"show ip dhcp pool VLAN20
+Current index: 192.168.20.20
+Total addresses: 20
+Leased: 20","DHCP pool exhausted, no addresses left to lease",Layer 3,dhcp-pool-exhaustion,Medium,simulated
+C011,DHCP,PC receives an IP address from the wrong subnet.,Two DHCP pools misconfigured with overlapping option settings.,"show ip dhcp pool
+Pool VLAN10: network 192.168.20.0 255.255.255.0",DHCP pool for VLAN10 mistakenly configured with VLAN20's subnet,Layer 3,dhcp-pool-misconfig,Medium,simulated
+C012,DHCP,PC fails to renew IP lease and drops off the network periodically.,DHCP lease time set very short for testing and never changed back.,"show ip dhcp pool VLAN30
+Lease: 0 days 0 hours 2 minutes","DHCP lease time set too short, causing frequent renewal failures under load",Layer 3,dhcp-lease-time,Low,simulated
+C013,DNS,PC can ping a server by IP but cannot reach it by hostname.,PC configured with a DNS server IP that does not respond.,"PC ipconfig /all
+DNS Servers: 192.168.100.200 (unreachable)",Incorrect or unreachable DNS server configured on the client,Layer 7,dns-server-unreachable,Medium,simulated
+C014,DNS,Internal hostname resolves to the wrong IP address.,Internal DNS server has a stale A record for a recently re-IPed server.,"nslookup fileserver01
+Address: 192.168.10.50 (old IP, server moved to .60)",Stale DNS A record not updated after server IP change,Layer 7,dns-stale-record,Low,simulated
+C015,DNS,"All external websites fail to load by name, but internal name resolution works.","Router configured with internal DNS server only, no forwarder to external DNS.","show running-config | include name-server
+ip name-server 192.168.1.10",No external DNS forwarder configured; internal DNS server cannot resolve external names,Layer 7,dns-forwarder-missing,Medium,simulated
+C016,Routing,PC can reach its own VLAN's gateway but cannot reach a server in another VLAN.,L3 switch routes between VLAN 30 and VLAN 10.,"show ip route
+(no route to 192.168.10.0/24 listed)",Missing route or disabled routing between VLAN 30 and VLAN 10,Layer 3,missing-interVLAN-route,High,simulated
+C017,Routing,Branch office cannot reach headquarters network over a WAN link.,"Two routers connected via a serial link, static routing configured.","show ip route
+Gateway of last resort is not set
+(no static route to 10.10.0.0/16)",Missing static route to the remote network on the branch router,Layer 3,missing-static-route,High,simulated
+C018,Routing,Route to a destination exists but traffic is not using it; packets seem to take a longer path.,Two routes exist to the same destination network with different metrics.,"show ip route 172.16.0.0
+Routing entry via two paths, AD 120 (RIP) preferred over AD 90 (EIGRP) incorrectly",Incorrect administrative distance or misconfigured routing protocol causing suboptimal path selection,Layer 3,routing-metric-AD-issue,Low,simulated
+C019,Routing,OSPF neighbors never form; routes from the neighboring router are missing.,"Two routers on the same segment, both configured for OSPF area 0.","show ip ospf neighbor
+(empty output)
+show ip ospf interface
+Process ID mismatch, Hello interval mismatch",OSPF neighbor adjacency failing due to Hello/Dead timer mismatch between routers,Layer 3,ospf-neighbor-mismatch,Medium,simulated
+C020,ACL,"Server that should be reachable from one VLAN is blocked entirely, even for permitted traffic.",ACL applied to router interface to restrict access to a finance server.,"show access-lists
+ACL FINANCE-ACL
+10 deny ip any any
+20 permit ip 192.168.10.0 0.0.0.255 any",ACL rule order is wrong; deny-all placed before the intended permit statement,Layer 3,acl-rule-order,High,simulated
+C021,ACL,Guest Wi-Fi devices can reach an internal server that should be isolated.,ACL GUEST-ISOLATION intended to block VLAN 50 (guest) from VLAN 20 (internal).,"show ip interface Vlan50
+(no access list configured on this interface)",ACL exists but was never applied to the VLAN 50 interface,Layer 3,acl-not-applied,High,simulated
+C022,ACL,"Specific host can access a server; the same subnet's other hosts cannot, though they should be able to.",ACL uses a host-specific permit statement instead of the subnet.,"show access-lists
+10 permit ip host 192.168.30.5 any
+20 deny ip any any",ACL only permits a single host instead of the full subnet as intended,Layer 3,acl-wrong-scope,Medium,simulated
+C023,ACL,Remote management access (SSH) to a router stopped working after an ACL update.,Standard ACL applied to VTY lines for SSH restriction.,"show running-config | section line vty
+access-class MGMT-ACL in
+show access-lists MGMT-ACL
+10 permit host 10.0.0.5 (old admin IP)","ACL on VTY lines references outdated admin IP, blocking current management host",Layer 7,acl-vty-outdated,Medium,simulated
+C024,NAT,Internal PCs cannot reach the internet at all.,Router configured for NAT overload (PAT) on the outside interface.,"show ip nat translations
+(empty)
+show running-config | include ip nat
+(no ip nat inside/outside applied to interfaces)",NAT inside/outside not applied to the correct interfaces,Layer 3,nat-interfaces-not-applied,High,simulated
+C025,NAT,Internet works for some internal PCs but not others.,NAT configured with an access-list defining which internal hosts are translated.,"show access-lists NAT-ACL
+10 permit 192.168.10.0 0.0.0.255
+(VLAN 20 subnet 192.168.20.0 not included)",NAT ACL does not include all internal subnets that need translation,Layer 3,nat-acl-incomplete,Medium,simulated
+C026,NAT,A specific internal server (should be reachable from the internet) is not accessible externally.,Static NAT/port forwarding configured for a web server.,"show ip nat translations
+(no static entry for 192.168.10.100)",Static NAT entry for the internal server was never configured,Layer 3,nat-static-missing,Medium,simulated
+C027,Wireless,Laptop cannot see or connect to the office Wi-Fi network at all.,Wireless AP configured to broadcast SSID 'CorpNet' on VLAN 30.,"show running-config | section dot11
+ssid CorpNet
+  broadcast-ssid disable","SSID broadcast disabled on the AP, making the network invisible to clients",Layer 1/2,ssid-broadcast-disabled,Low,simulated
+C028,Wireless,Wireless clients connect to the SSID but immediately get disconnected.,AP configured with WPA2 and a shared passphrase; recently changed.,"AP log
+%DOT11-4-MAXRETRIES: Packet to client failed retry limit, deauthenticating",Passphrase mismatch between AP and previously saved client profiles causing repeated auth failures,Layer 2,wireless-auth-mismatch,Medium,simulated
+C029,Wireless,[REAL LAB — TO FILL IN] Guest Wi-Fi devices can reach the internal server across VLANs.,"[Build this in Packet Tracer: Guest SSID mapped to VLAN 50, internal server on VLAN 20, ACL should isolate them]",[Paste real show access-lists / show vlan brief output here after building the lab],[Fill in actual root cause you configure/observe],Layer 3,REAL-LAB-wireless-isolation,High,real-lab-pending
+C030,Wireless,[REAL LAB — TO FILL IN] PC on VLAN 30 cannot reach a server in VLAN 10 despite correct IP config.,"[Build this in Packet Tracer: PC on VLAN 30, server on VLAN 10, L3 switch routing between them, break the route]",[Paste real show ip route / show ip interface brief output here after building the lab],[Fill in actual root cause you configure/observe],Layer 3,REAL-LAB-routing,High,real-lab-pending
