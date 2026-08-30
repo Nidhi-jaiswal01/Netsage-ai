@@ -77,5 +77,9 @@ C029,Wireless,[REAL LAB — TO FILL IN] Guest Wi-Fi devices can reach the intern
 C030,Wireless,[REAL LAB — TO FILL IN] PC on VLAN 30 cannot reach a server in VLAN 10 despite correct IP config.,"[Build this in Packet Tracer: PC on VLAN 30, server on VLAN 10, L3 switch routing between them, break the route]",[Paste real show ip route / show ip interface brief output here after building the lab],[Fill in actual root cause you configure/observe],Layer 3,REAL-LAB-routing,High,real-lab-pending
 C031,Routing,Server in another VLAN is unreachable. It was working an hour ago.,No details provided about recent changes.,"show ip route (only default route 0.0.0.0/0 shown, no route to destination subnet) / show interfaces Gi0/1: Gi0/1 is up, line protocol is down",Line protocol down on Gi0/1 combined with missing route to destination subnet,Layer 3,ambiguous-evidence,Medium,simulated
 C032,DHCP,"Some devices on VLAN 20 get IP addresses, others don't, no clear pattern.",(none provided),(no show command output provided),Insufficient evidence provided to determine root cause,Layer 3,insufficient-evidence,Low,simulated
-C033,DHCP,Two PCs on the same VLAN both request DHCP but only one receives an IP address.,"Both PCs on VLAN 20, connected to the same switch. DHCP pool VLAN20 configured with a /28 subnet.",show ip dhcp pool VLAN20\nTotal addresses: 14\nLeased addresses: 14\nPending event: none,,Network,,,live
-C034,NAT,"Internal server is reachable from outside using its private IP over VPN, but not from regular internet traffic.",Static NAT configured for the server; NAT ACL also exists for general outbound traffic.,show ip nat translations\n(no matching translation for inbound port 443),,Network,,,live
+C033,DHCP,Two PCs on the same VLAN both request DHCP but only one receives an IP address.,"Both PCs on VLAN 20, connected to the same switch. DHCP pool VLAN20 configured with a /28 subnet.","show ip dhcp pool VLAN20
+Total addresses: 14
+Leased addresses: 14
+Pending event: none",,Layer 3,dhcp-pool-exhaustion,Medium,live
+C034,NAT,"Internal server is reachable from outside using its private IP over VPN, but not from regular internet traffic.",Static NAT configured for the server; NAT ACL also exists for general outbound traffic.,"show ip nat translations
+(no matching translation for inbound port 443)",,Layer 3,nat-port-forward-missing,Medium,live

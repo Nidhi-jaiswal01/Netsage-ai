@@ -220,12 +220,14 @@ You will be given: a symptom description, Packet Tracer notes, and show-command 
 Respond ONLY with valid JSON in this exact shape, no markdown fences, no extra text:
 {
   "root_cause": "short, specific description of the likely fault",
-  "osi_layer": "one of: Physical, Data Link, Network, Transport, Session, Presentation, Application",
+  "osi_layer": "one of: Layer 1, Layer 2, Layer 3, Layer 4, Layer 7",
   "confidence": 0.0 to 1.0,
   "evidence": "specific evidence from the input that supports this diagnosis",
   "next_command": "a single show/debug command to confirm the fault",
   "fix_steps": ["step 1", "step 2", "step 3"],
-  "category": "one of: VLAN, Gateway, DHCP, DNS, Routing, ACL, NAT, Wireless"
+  "category": "one of: VLAN, Gateway, DHCP, DNS, Routing, ACL, NAT, Wireless",
+  "concept_tag": "a short kebab-case tag summarizing the fault type, e.g. vlan-misassignment, missing-static-route, acl-deny-before-permit",
+  "severity": "one of: Low, Medium, High"
 }"""
 
 
@@ -271,8 +273,8 @@ SHOW COMMAND OUTPUT:
         "packet_tracer_notes": req.packet_tracer_notes,
         "show_output": req.show_output,
         "expected_fault": "",
-        "concept_tag": "",
-        "severity": "",
+        "concept_tag": diagnosis.get("concept_tag", ""),
+        "severity": diagnosis.get("severity", ""),
         "source": "live",
         "match_looks_correct": "",
         "parse_status": parse_status,
