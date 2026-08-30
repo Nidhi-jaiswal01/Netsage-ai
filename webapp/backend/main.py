@@ -16,7 +16,12 @@ app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://localhost:5174",
+        "http://127.0.0.1:5173",
+        "http://127.0.0.1:5174",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -72,6 +77,7 @@ def seed_from_csv():
             "symptom": c.get("symptom", ""),
             "packet_tracer_notes": c.get("topology_note", ""),
             "show_output": c.get("show_output", ""),
+            "expected_fault": c.get("expected_fault", ""),
             "diagnosis": {
                 "root_cause": ai.get("ai_root_cause", c.get("expected_fault", "")),
                 "osi_layer": ai.get("ai_osi_layer", c.get("osi_layer", "")),
@@ -132,11 +138,14 @@ SHOW COMMAND OUTPUT:
 {req.show_output or "(none provided)"}"""
 
     response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model="openai/gpt-oss-20b",
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": user_content},
         ],
+        temperature=0.2,
+        max_completion_tokens=2000,
+        reasoning_effort="low",
     )
     raw = response.choices[0].message.content.strip()
     raw = raw.replace("```json", "").replace("```", "").strip()
@@ -159,6 +168,7 @@ SHOW COMMAND OUTPUT:
         "symptom": req.symptom,
         "packet_tracer_notes": req.packet_tracer_notes,
         "show_output": req.show_output,
+        "expected_fault": "",
         "diagnosis": diagnosis,
         "verdict": "Pending",
         "reviewer_note": "",

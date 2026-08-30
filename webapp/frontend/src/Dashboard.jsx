@@ -128,36 +128,104 @@ function Dashboard() {
         <div className="section-title">case log (click a row to expand)</div>
         <div className="panel">
           <div className="case-log">
-            {cases.map((c) => (
-              <div
-                key={c.id}
-                className={`case-entry ${openId === c.id ? 'open' : ''}`}
-                onClick={() => setOpenId(openId === c.id ? null : c.id)}
-              >
-                <div className="case-head">
-                  <span className="case-id">{c.id}</span>
-                  <span className="case-cat">{c.diagnosis.category}</span>
-                  <span className="case-symptom">{c.symptom}</span>
-                  <span className={`badge ${c.verdict.toLowerCase()}`}>{c.verdict}</span>
-                </div>
-                <div className="case-detail">
-                  <div className="detail-row">
-                    <span className="detail-label">Root Cause</span>
-                    {c.diagnosis.root_cause}
+            {cases.map((c) => {
+              const d = c.diagnosis || {};
+              const confPct = Math.round((d.confidence || 0) * 100);
+              return (
+                <div
+                  key={c.id}
+                  className={`case-entry ${openId === c.id ? 'open' : ''}`}
+                  onClick={() => setOpenId(openId === c.id ? null : c.id)}
+                >
+                  <div className="case-head">
+                    <span className="case-id">{c.id}</span>
+                    <span className="case-cat">{d.category}</span>
+                    <span className="case-symptom">{c.symptom}</span>
+                    <span className={`badge ${c.verdict.toLowerCase()}`}>{c.verdict}</span>
                   </div>
-                  <div className="detail-row">
-                    <span className="detail-label">Next Command</span>
-                    {c.diagnosis.next_command}
-                  </div>
-                  {c.reviewer_note && (
-                    <div className="detail-row">
-                      <span className="detail-label">Reviewer Note</span>
-                      <span className="detail-note">{c.reviewer_note}</span>
+
+                  <div className="case-detail">
+                    <div className="detail-row full">
+                      <span className="detail-label">Symptom</span>
+                      {c.symptom}
                     </div>
-                  )}
+
+                    {c.packet_tracer_notes && (
+                      <div className="detail-row full">
+                        <span className="detail-label">Packet Tracer Notes</span>
+                        {c.packet_tracer_notes}
+                      </div>
+                    )}
+
+                    {c.show_output && (
+                      <div className="detail-row full">
+                        <span className="detail-label">Show Command Output</span>
+                        <pre className="show-output">{c.show_output}</pre>
+                      </div>
+                    )}
+
+                    {c.expected_fault && (
+                      <div className="compare-grid">
+                        <div>
+                          <span className="detail-label">Expected Fault (ground truth)</span>
+                          <p>{c.expected_fault}</p>
+                        </div>
+                        <div>
+                          <span className="detail-label">AI Root Cause</span>
+                          <p>{d.root_cause}</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {!c.expected_fault && (
+                      <div className="detail-row full">
+                        <span className="detail-label">AI Root Cause</span>
+                        <p>{d.root_cause}</p>
+                      </div>
+                    )}
+
+                    <div className="compare-grid">
+                      <div>
+                        <span className="detail-label">OSI Layer</span>
+                        <p>{d.osi_layer}</p>
+                      </div>
+                      <div>
+                        <span className="detail-label">Confidence</span>
+                        <p>{confPct}%</p>
+                      </div>
+                    </div>
+
+                    <div className="detail-row full">
+                      <span className="detail-label">Evidence</span>
+                      <p>{d.evidence}</p>
+                    </div>
+
+                    <div className="detail-row full">
+                      <span className="detail-label">Next Command</span>
+                      <p className="mono-inline">{d.next_command}</p>
+                    </div>
+
+                    {d.fix_steps && d.fix_steps.length > 0 && (
+                      <div className="detail-row full">
+                        <span className="detail-label">Fix Steps</span>
+                        <ol>
+                          {d.fix_steps.map((s, i) => (
+                            <li key={i}>{s}</li>
+                          ))}
+                        </ol>
+                      </div>
+                    )}
+
+                    {c.reviewer_note && (
+                      <div className="detail-row full">
+                        <span className="detail-label">Reviewer Note</span>
+                        <span className="detail-note">{c.reviewer_note}</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
             {cases.length === 0 && <p className="empty-note">No cases logged yet.</p>}
           </div>
         </div>
