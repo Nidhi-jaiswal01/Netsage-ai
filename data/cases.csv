@@ -73,7 +73,9 @@ ssid CorpNet
   broadcast-ssid disable","SSID broadcast disabled on the AP, making the network invisible to clients",Layer 2,ssid-broadcast-disabled,Low,simulated
 C028,Wireless,Wireless clients connect to the SSID but immediately get disconnected.,AP configured with WPA2 and a shared passphrase; recently changed.,"AP log
 %DOT11-4-MAXRETRIES: Packet to client failed retry limit, deauthenticating",Passphrase mismatch between AP and previously saved client profiles causing repeated auth failures,Layer 2,wireless-auth-mismatch,Medium,simulated
-C029,Wireless,[REAL LAB — TO FILL IN] Guest Wi-Fi devices can reach the internal server across VLANs.,"[Build this in Packet Tracer: Guest SSID mapped to VLAN 50, internal server on VLAN 20, ACL should isolate them]",[Paste real show access-lists / show vlan brief output here after building the lab],[Fill in actual root cause you configure/observe],Layer 3,REAL-LAB-wireless-isolation,High,real-lab-pending
+C029,ACL,"Guest Wi-Fi laptop on VLAN 50 can reach the internal server on VLAN 20, which should be isolated.","Multilayer switch: VLAN 50 (GUEST) on Fa0/2, VLAN 20 (INTERNAL) on Fa0/3. SVI Vlan50 = 192.168.50.1, SVI Vlan20 = 192.168.20.1, both up.","Switch#show access-lists
+Switch#
+(no output - no ACL configured)",,Layer 3,missing-guest-acl,Medium,live
 C030,Routing,PC on VLAN 30 cannot reach a server on VLAN 10 despite both having correct IP configuration and gateways.,"L3 switch with VLAN 30 (clients) and VLAN 10 (servers) configured; both SVIs are up with correct IPs, but the switch has not been enabled to route between VLANs.","show ip route
 (no routes listed for 192.168.30.0/24 or 192.168.10.0/24 as connected routes)
 show ip interface brief
