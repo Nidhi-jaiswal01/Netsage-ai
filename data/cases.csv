@@ -74,7 +74,11 @@ ssid CorpNet
 C028,Wireless,Wireless clients connect to the SSID but immediately get disconnected.,AP configured with WPA2 and a shared passphrase; recently changed.,"AP log
 %DOT11-4-MAXRETRIES: Packet to client failed retry limit, deauthenticating",Passphrase mismatch between AP and previously saved client profiles causing repeated auth failures,Layer 2,wireless-auth-mismatch,Medium,simulated
 C029,Wireless,[REAL LAB — TO FILL IN] Guest Wi-Fi devices can reach the internal server across VLANs.,"[Build this in Packet Tracer: Guest SSID mapped to VLAN 50, internal server on VLAN 20, ACL should isolate them]",[Paste real show access-lists / show vlan brief output here after building the lab],[Fill in actual root cause you configure/observe],Layer 3,REAL-LAB-wireless-isolation,High,real-lab-pending
-C030,Wireless,[REAL LAB — TO FILL IN] PC on VLAN 30 cannot reach a server in VLAN 10 despite correct IP config.,"[Build this in Packet Tracer: PC on VLAN 30, server on VLAN 10, L3 switch routing between them, break the route]",[Paste real show ip route / show ip interface brief output here after building the lab],[Fill in actual root cause you configure/observe],Layer 3,REAL-LAB-routing,High,real-lab-pending
+C030,Routing,PC on VLAN 30 cannot reach a server on VLAN 10 despite both having correct IP configuration and gateways.,"L3 switch with VLAN 30 (clients) and VLAN 10 (servers) configured; both SVIs are up with correct IPs, but the switch has not been enabled to route between VLANs.","show ip route
+(no routes listed for 192.168.30.0/24 or 192.168.10.0/24 as connected routes)
+show ip interface brief
+Vlan30  192.168.30.1  YES manual  up  up
+Vlan10  192.168.10.1  YES manual  up  up","IP routing not enabled on the Layer 3 switch (missing global ip routing command), so no inter-VLAN routing occurs despite both SVIs being up",Layer 3,ip-routing-disabled,High,simulated
 C031,Routing,Server in another VLAN is unreachable. It was working an hour ago.,No details provided about recent changes.,"show ip route (only default route 0.0.0.0/0 shown, no route to destination subnet) / show interfaces Gi0/1: Gi0/1 is up, line protocol is down",Line protocol down on Gi0/1 combined with missing route to destination subnet,Layer 3,ambiguous-evidence,Medium,simulated
 C032,DHCP,"Some devices on VLAN 20 get IP addresses, others don't, no clear pattern.",(none provided),(no show command output provided),Insufficient evidence provided to determine root cause,Layer 3,insufficient-evidence,Low,simulated
 C033,DHCP,Two PCs on the same VLAN both request DHCP but only one receives an IP address.,"Both PCs on VLAN 20, connected to the same switch. DHCP pool VLAN20 configured with a /28 subnet.","show ip dhcp pool VLAN20
@@ -83,3 +87,9 @@ Leased addresses: 14
 Pending event: none",,Layer 3,dhcp-pool-exhaustion,Medium,live
 C034,NAT,"Internal server is reachable from outside using its private IP over VPN, but not from regular internet traffic.",Static NAT configured for the server; NAT ACL also exists for general outbound traffic.,"show ip nat translations
 (no matching translation for inbound port 443)",,Layer 3,nat-port-forward-missing,Medium,live
+C035,ACL,"Users on VLAN 10 can access the finance server, but users on VLAN 20 who should also have access cannot.","ACL FINANCE-ACCESS is supposed to permit both VLAN 10 and VLAN 20 subnets, applied inbound on the finance server's SVI.",show access-lists FINANCE-ACCESS\nStandard IP access list FINANCE-ACCESS\n    10 permit 192.168.10.0 0.0.0.255 (240 matches)\n    20 deny any (85 matches),,Layer 3,missing-permit-vlan-20,High,live
+C036,Routing,"Two branch offices connected via separate WAN links to HQ cannot reach each other, though both can reach HQ fine.",Both branches use static default routes pointing to HQ. HQ router has routes to both branch subnets.,show ip route\n(Branch A) S* 0.0.0.0/0 [1/0] via HQ-link\nshow running-config | include ip route\n(no specific route between Branch A and Branch B subnets exists anywhere),,Layer 3,missing-static-route,Medium,live
+C037,VLAN,"PC connects fine but loses network access randomly for a few seconds every couple of minutes, only on this one port.",Switchport Gi0/12 configured as access port in VLAN 20; spanning-tree PortFast not enabled.,"show spanning-tree interface Gi0/12
+Role: Desg  Sts: LISTENING
+show interfaces Gi0/12 counters
+Topology change count: 15 (last 10 minutes)",PortFast not enabled on access port causing repeated STP topology changes and brief link flaps,Layer 2,stp-portfast-missing,Low,simulated

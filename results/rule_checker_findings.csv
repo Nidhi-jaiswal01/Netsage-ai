@@ -28,9 +28,12 @@ C026,NAT,none,No deterministic rule triggered for this case
 C027,Wireless,none,No deterministic rule triggered for this case
 C028,Wireless,none,No deterministic rule triggered for this case
 C029,Wireless,none,No deterministic rule triggered for this case
-C030,Wireless,none,No deterministic rule triggered for this case
+C030,Routing,none,No deterministic rule triggered for this case
 C031,Routing,wrong_mask,"Multiple differing subnet masks found in evidence: ['/0', '/1']"
 C031,Routing,missing_route,Expected route to destination network appears to be missing
 C032,DHCP,none,No deterministic rule triggered for this case
 C033,DHCP,none,No deterministic rule triggered for this case
 C034,NAT,none,No deterministic rule triggered for this case
+C035,ACL,none,No deterministic rule triggered for this case
+C036,Routing,none,No deterministic rule triggered for this case
+C037,VLAN,none,No deterministic rule triggered for this case
