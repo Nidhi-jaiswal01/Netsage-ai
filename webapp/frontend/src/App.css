@@ -155,7 +155,7 @@ button {
 .badge-line.edited { color: var(--accent-amber); }
 .badge-line.rejected { color: var(--accent-red); }
 
-.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 32px; }
+.stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 32px; }
 .stat-card {
   background: var(--panel); border: 1px solid var(--panel-border); border-radius: 8px;
   padding: 18px 18px 16px; position: relative; overflow: hidden;
@@ -245,31 +245,6 @@ section { margin-bottom: 40px; }
   margin-bottom: 14px;
 }
 
-.case-detail .detail-row.full { margin-bottom: 14px; }
-.case-detail p { margin: 0; }
-.case-detail ol { margin: 4px 0 0; padding-left: 18px; }
-.case-detail .mono-inline { font-family: var(--mono); color: var(--accent-blue); }
-
-.show-output {
-  background: #0b0f14;
-  border: 1px solid var(--panel-border);
-  border-radius: 6px;
-  padding: 10px 12px;
-  font-family: var(--mono);
-  font-size: 12px;
-  color: var(--text-dim);
-  white-space: pre-wrap;
-  margin-top: 4px;
-  overflow-x: auto;
-}
-
-.compare-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-bottom: 14px;
-}
-
 .case-detail .review-bar {
   display: flex;
   gap: 8px;
@@ -293,3 +268,14 @@ section { margin-bottom: 40px; }
 .case-detail .edit { background: var(--accent-amber); }
 .case-detail .reject { background: var(--accent-red); color: #fff; }
 .case-detail .delete { background: #30363d; color: #f2555a; border: 1px solid #f2555a; }
+
+.rule-findings {
+  margin: 4px 0 0;
+  padding-left: 18px;
+  color: var(--accent-amber);
+}
+.rule-check-name {
+  font-family: var(--mono);
+  color: var(--accent-red);
+  font-weight: 600;
+}

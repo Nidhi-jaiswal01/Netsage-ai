@@ -50,7 +50,7 @@ function Dashboard() {
 
   if (!summary) return <div className="panel">Loading...</div>;
 
-  const { total, verdict_counts, category_counts } = summary;
+  const { total, verdict_counts, category_counts, rule_checker_hits } = summary;
   const maxCat = Math.max(1, ...Object.values(category_counts));
 
   const verdictColors = {
@@ -82,7 +82,7 @@ function Dashboard() {
         </div>
         <h1>NetSage AI — Diagnosis Dashboard</h1>
         <p className="subtitle">
-          {total} case{total !== 1 ? 's' : ''} · AI diagnosis · human-reviewed
+          {total} case{total !== 1 ? 's' : ''} · AI diagnosis · rule-checked · human-reviewed
         </p>
       </div>
 
@@ -104,6 +104,10 @@ function Dashboard() {
         <div className="stat-card" style={{ '--bar-color': '#e0a12c' }}>
           <div className="stat-num">{verdict_counts.Pending || 0}</div>
           <div className="stat-label">Pending Review</div>
+        </div>
+        <div className="stat-card" style={{ '--bar-color': '#4fa3f7' }}>
+          <div className="stat-num">{rule_checker_hits || 0}</div>
+          <div className="stat-label">Rule Checker Hits</div>
         </div>
       </div>
 
@@ -185,6 +189,19 @@ function Dashboard() {
                       <div className="detail-row full">
                         <span className="detail-label">Show Command Output</span>
                         <pre className="show-output">{c.show_output}</pre>
+                      </div>
+                    )}
+
+                    {c.rule_findings && c.rule_findings.length > 0 && (
+                      <div className="detail-row full">
+                        <span className="detail-label">Rule Checker Findings</span>
+                        <ul className="rule-findings">
+                          {c.rule_findings.map((f, i) => (
+                            <li key={i}>
+                              <span className="rule-check-name">{f.check}</span>: {f.detail}
+                            </li>
+                          ))}
+                        </ul>
                       </div>
                     )}
 
