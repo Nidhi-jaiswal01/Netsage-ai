@@ -6,6 +6,7 @@ function Dashboard() {
   const [summary, setSummary] = useState(null);
   const [cases, setCases] = useState([]);
   const [openId, setOpenId] = useState(null);
+  const [notes, setNotes] = useState({});
 
   const load = async () => {
     try {
@@ -23,6 +24,29 @@ function Dashboard() {
   useEffect(() => {
     load();
   }, []);
+
+  const handleReview = async (caseId, verdict) => {
+    try {
+      await fetch(`${API_BASE}/cases/${caseId}/review`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ verdict, note: notes[caseId] || '' }),
+      });
+      await load();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleDelete = async (caseId) => {
+    if (!window.confirm(`Delete case ${caseId}? This cannot be undone.`)) return;
+    try {
+      await fetch(`${API_BASE}/cases/${caseId}`, { method: 'DELETE' });
+      await load();
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   if (!summary) return <div className="panel">Loading...</div>;
 
@@ -131,13 +155,13 @@ function Dashboard() {
             {cases.map((c) => {
               const d = c.diagnosis || {};
               const confPct = Math.round((d.confidence || 0) * 100);
+              const isOpen = openId === c.id;
               return (
-                <div
-                  key={c.id}
-                  className={`case-entry ${openId === c.id ? 'open' : ''}`}
-                  onClick={() => setOpenId(openId === c.id ? null : c.id)}
-                >
-                  <div className="case-head">
+                <div key={c.id} className={`case-entry ${isOpen ? 'open' : ''}`}>
+                  <div
+                    className="case-head"
+                    onClick={() => setOpenId(isOpen ? null : c.id)}
+                  >
                     <span className="case-id">{c.id}</span>
                     <span className="case-cat">{d.category}</span>
                     <span className="case-symptom">{c.symptom}</span>
@@ -218,10 +242,33 @@ function Dashboard() {
 
                     {c.reviewer_note && (
                       <div className="detail-row full">
-                        <span className="detail-label">Reviewer Note</span>
+                        <span className="detail-label">Current Reviewer Note</span>
                         <span className="detail-note">{c.reviewer_note}</span>
                       </div>
                     )}
+
+                    <div className="review-bar" onClick={(e) => e.stopPropagation()}>
+                      <input
+                        className="note-input"
+                        placeholder="Reviewer note (optional)..."
+                        value={notes[c.id] || ''}
+                        onChange={(e) =>
+                          setNotes({ ...notes, [c.id]: e.target.value })
+                        }
+                      />
+                      <button className="accept" onClick={() => handleReview(c.id, 'Accepted')}>
+                        Accept
+                      </button>
+                      <button className="edit" onClick={() => handleReview(c.id, 'Edited')}>
+                        Mark Edited
+                      </button>
+                      <button className="reject" onClick={() => handleReview(c.id, 'Rejected')}>
+                        Reject
+                      </button>
+                      <button className="delete" onClick={() => handleDelete(c.id)}>
+                        Delete
+                      </button>
+                    </div>
                   </div>
                 </div>
               );
